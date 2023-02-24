@@ -12,4 +12,14 @@ class EventWatcher
     {
         $this->events[] = $event;
     }
+
+    public function check(): void
+    {
+
+    }
+
+    public function react(): void
+    {
+        
+    }
 }
