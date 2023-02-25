@@ -4,5 +4,5 @@ namespace EventManager\Event;
 
 interface Reaction 
 {
-    public function react(): void;
+    public function react(array $additionalData): void;
 }
