@@ -2,7 +2,7 @@
     "name": "esoastor/event-manager",
     "autoload": {
         "psr-4": {
-            "EventManager\\": "src/"
+            "Esoastor\\EventManager\\": "src/"
         }
     },
     "require": {
