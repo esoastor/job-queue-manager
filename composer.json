@@ -1,5 +1,5 @@
 {
-    "name": "esoastor/event-manager",
+    "name": "esoastor/queue-manager",
     "autoload": {
         "psr-4": {
             "EventManager\\": "src/"
