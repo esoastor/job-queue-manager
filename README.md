@@ -1,3 +1,5 @@
+So, basically it jobs that go to job query only if some kind of trigger fires. I run it on crone to check some stuff and do another stuff in case if cheking passed
+
 There are examle in src/Example. In action it looks something like this
 
 ```
