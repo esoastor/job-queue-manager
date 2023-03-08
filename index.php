@@ -1,20 +1,17 @@
 <?php
 require_once 'vendor/autoload.php';
-
-use EventManager\EventWatcher;
-use EventManager\Example;
-
-$triggerWatcher = new Example\RandomBoolWatcher();
-$reaction = new Example\EchoReaction();
-
-$event1 = new Example\RandomBoolEvent($triggerWatcher, $reaction);
-$event2 = new Example\RandomBoolEvent($triggerWatcher, $reaction);
+require_once 'example/PutInFileJob.php';
 
 
-$eventsWatcher = new EventWatcher();
+use Esoastor\JobQueueManager\JobQueueManager;
+use Database\Schema\Mysql\MysqlConstructor;
 
-$eventsWatcher->addEvent($event1);
-$eventsWatcher->addEvent($event2);
+$constructor = new MysqlConstructor('mysql:3306', 'test', 'test', 'test');
 
-$eventsWatcher->check();
-$eventsWatcher->react();
+$manager = new JobQueueManager($constructor, 'test_table');
+$manager->initTable();
+$job = new PutInFileJob();
+
+$manager->addJob($job);
+
+$manager->executeJob();

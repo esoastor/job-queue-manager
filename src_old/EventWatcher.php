@@ -1,31 +1,26 @@
 <?php
 
-namespace EventManager;
+namespace Esoastor\EventManager;
 
 use EventManager\Event\Event;
+use \Database\Schema\Constructor;
 
 class EventWatcher
 {
     private array $events = [];
-
-    # TODO: fix it later
-    private string $dbFileName = 'test.sqlite';
     private string $tableName = 'triggered_events';
-    private \PDO $pdo;
 
-    public function __construct()
+    public function __construct(private Constructor $constructor)
     {
-        # TODO: fix it later
-        $this->pdo = new \PDO('sqlite:' . $this->dbFileName);
+        $blueprint =  $this->constructor->getBlueprintBuilder();
 
-        $query = <<<TEXT
-            CREATE TABLE IF NOT EXISTS {$this->tableName} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                event_id INTEGER NOT NULL
-            );
-        TEXT;
+        $this->constructor->createTable($this->tableName, [
+            $blueprint->id(),
+            $blueprint->string('event_class')->length(50),
+            $blueprint->string('params')->length(1000),
+        ]);
 
-        $this->pdo->exec($query);
+        $this->table = $this->constructor->getDatabase()->table($this->tableName);
 
     }
 

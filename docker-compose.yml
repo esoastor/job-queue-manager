@@ -7,3 +7,23 @@ services:
       - "8899:5000"
     volumes:
       - .:/var/www/
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: test
+    expose:
+      - '3306'
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: test
+      PMA_PASSWORD: test
+    ports:
+      - 7770:80
+    depends_on:
+      - mysql
