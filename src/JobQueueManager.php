@@ -20,8 +20,8 @@ class JobQueueManager
 
         $this->constructor->createTable($this->tableName, [
             $blueprint->id(),
-            $blueprint->varchar('job')->length(50),
-            $blueprint->text('status')->length(1000),
+            $blueprint->text('job')->length(1000),
+            $blueprint->varchar('status')->length(50),
             $blueprint->varchar('date_insert')->length(20),
         ]);
 
