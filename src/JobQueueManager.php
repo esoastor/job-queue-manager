@@ -39,7 +39,13 @@ class JobQueueManager
 
     public function executeJob(): void
     {
-        $lastJobData = $this->table->select()->where('status', 'new')->execute()[0];
+        $jobsData = $this->table->select()->where('status', 'new')->execute();
+
+        if (empty($jobsData)) {
+            return;
+        }
+        
+        $lastJobData = $jobsData[0];
 
         $job = unserialize($lastJobData['job']);
 
