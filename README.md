@@ -16,5 +16,6 @@ $job = new PutInFileJob();
 
 $manager->addJob($job);
 
-$manager->executeJob();
+# all jobs will be executed
+$manager->executeJobs();
 ```

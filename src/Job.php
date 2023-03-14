@@ -2,7 +2,14 @@
 
 namespace Esoastor\JobQueueManager;
 
-interface Job
+abstract class Job
 {
-    public function handle(): void;
+    protected bool $isConstant;
+
+    public function isConstant(): bool
+    {
+        return $this->isConstant;
+    }
+
+    abstract public function handle(): void;
 }

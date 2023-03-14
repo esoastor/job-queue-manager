@@ -1,8 +1,8 @@
 <?php
 
-use Esoastor\JobQueueManager\Job;
+use Esoastor\JobQueueManager\OneTimeJob;
 
-class PutInFileJob implements Job
+class PutInFileJob extends OneTimeJob
 {
     public function handle(): void
     {
