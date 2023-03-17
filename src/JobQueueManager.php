@@ -46,7 +46,7 @@ class JobQueueManager
 
     public function executeJobs(): void
     {
-        $jobsData = $this->table->select()->where('status', 'new')->where('status', 'wait')->execute();
+        $jobsData = $this->table->select()->whereIn('status', ['new', 'wait'])->execute();
 
         if (empty($jobsData)) {
             return;
