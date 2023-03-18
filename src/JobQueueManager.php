@@ -70,12 +70,12 @@ class JobQueueManager
         $this->handleJob($jobData, $ignoreTimeOfNextRun);
     }
 
-    protected function handleJob(array $jobData, $ignoreTimeOfNextRun = false)
+    protected function handleJob(array $jobData, $ignoreTimeOfNextRun = false): void
     {
         $job = unserialize($jobData['job']);
             
         if ($job->isConstant() && $jobData['next_run'] > time() && !$ignoreTimeOfNextRun) {
-            continue;
+            return;
         }
 
         $this->table->update(['status' => 'pending'])->where('id', (string) $jobData['id'])->execute();
