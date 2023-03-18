@@ -44,7 +44,7 @@ class JobQueueManager
         $this->table->insert($fields)->execute();
     }
 
-    public function executeJobs(): void
+    public function executeAll(bool $ignoreTimeOfNextRun = false): void
     {
         $jobsData = $this->table->select()->whereIn('status', ['new', 'wait'])->execute();
 
@@ -54,27 +54,38 @@ class JobQueueManager
         
 
         foreach ($jobsData as $jobData) {
-            $job = unserialize($jobData['job']);
-            
-            if ($job->isConstant() && $jobData['next_run'] > time()) {
-                continue;
-            }
+            $this->handleJob($jobData);
+        }
+    }
 
-            $this->table->update(['status' => 'pending'])->where('id', (string) $jobData['id'])->execute();
+    public function execute(string $jobId, bool $ignoreTimeOfNextRun = false): void
+    {
+        $jobData = $this->table->select()->where('id', $jobId)->execute()[0];
+
+        $this->handleJob($jobData, $ignoreTimeOfNextRun);
+    }
+
+    protected function handleJob(array $jobData, $ignoreTimeOfNextRun = false)
+    {
+        $job = unserialize($jobData['job']);
+            
+        if ($job->isConstant() && $jobData['next_run'] > time() && !$ignoreTimeOfNextRun) {
+            continue;
+        }
+
+        $this->table->update(['status' => 'pending'])->where('id', (string) $jobData['id'])->execute();
     
-            try {
-                $job->handle();
-            } catch (\Throwable $error) {
-                $this->table->update(['status' => 'error'])->where('id', (string) $jobData['id'])->execute();
-                die;
-            }
-    
-            if ($job->isConstant()) {
-                $this->table->update(['status' => 'wait', 'next_run' => time() + $job->getInterval()])->where('id', (string) $jobData['id'])->execute();
-            } else {
-                $this->table->delete()->where('id', (string) $jobData['id'])->execute();
-            }
-    
+        try {
+            $job->handle();
+        } catch (\Throwable $error) {
+            $this->table->update(['status' => 'error'])->where('id', (string) $jobData['id'])->execute();
+            die;
+        }
+
+        if ($job->isConstant()) {
+            $this->table->update(['status' => 'wait', 'next_run' => time() + $job->getInterval()])->where('id', (string) $jobData['id'])->execute();
+        } else {
+            $this->table->delete()->where('id', (string) $jobData['id'])->execute();
         }
     }
 }
