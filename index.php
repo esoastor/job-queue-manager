@@ -18,4 +18,4 @@ $constantJob->setInterval(20);
 $manager->addJob($oneTimeJob);
 $manager->addJob($constantJob);
 
-$manager->executeJobs();
+$manager->executeAll();
