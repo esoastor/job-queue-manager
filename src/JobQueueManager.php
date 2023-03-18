@@ -29,6 +29,11 @@ class JobQueueManager
         $this->table = $this->constructor->getDatabase()->table($this->tableName);
     }
 
+    public function getJobList(): array
+    {
+        return $this->table->select()->execute();
+    }
+
     public function addJob(Job $job): void
     {
         if (!isset($this->table)) {
