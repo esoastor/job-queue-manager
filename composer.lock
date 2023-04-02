@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd535ac92a8a1bbfeac4fc4991d7df61",
+    "content-hash": "578f203c1229d63a50b8d5a0e15cce61",
     "packages": [
         {
             "name": "esoastor/database-manager",
-            "version": "v0.0.16",
+            "version": "v0.0.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/esoastor/database-manager.git",
-                "reference": "9a1c6b27f8b103b12ce5b03f23785c7f99bac3c5"
+                "reference": "be28c69d6be59528b501fb5cf507ea665cc347ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/esoastor/database-manager/zipball/9a1c6b27f8b103b12ce5b03f23785c7f99bac3c5",
-                "reference": "9a1c6b27f8b103b12ce5b03f23785c7f99bac3c5",
+                "url": "https://api.github.com/repos/esoastor/database-manager/zipball/be28c69d6be59528b501fb5cf507ea665cc347ad",
+                "reference": "be28c69d6be59528b501fb5cf507ea665cc347ad",
                 "shasum": ""
             },
             "require": {
@@ -35,9 +35,36 @@
             "notification-url": "https://packagist.org/downloads/",
             "support": {
                 "issues": "https://github.com/esoastor/database-manager/issues",
-                "source": "https://github.com/esoastor/database-manager/tree/v0.0.16"
+                "source": "https://github.com/esoastor/database-manager/tree/v0.0.19"
             },
-            "time": "2023-03-08T19:41:53+00:00"
+            "time": "2023-03-18T06:53:48+00:00"
+        },
+        {
+            "name": "esoastor/event-manager",
+            "version": "0.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/esoastor/event-manager.git",
+                "reference": "f4d33916481633af5ad700eb4d8763d931aa79ea"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/esoastor/event-manager/zipball/f4d33916481633af5ad700eb4d8763d931aa79ea",
+                "reference": "f4d33916481633af5ad700eb4d8763d931aa79ea",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Esoastor\\EventManager\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "support": {
+                "issues": "https://github.com/esoastor/event-manager/issues",
+                "source": "https://github.com/esoastor/event-manager/tree/0.0.7"
+            },
+            "time": "2023-04-02T14:04:13+00:00"
         }
     ],
     "packages-dev": [],

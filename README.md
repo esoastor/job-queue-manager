@@ -19,3 +19,13 @@ $manager->addJob($job);
 # all jobs will be executed
 $manager->executeJobs();
 ```
+
+work statuses
+- new - new constant or regular job
+- running - job is running now
+- on - inactive constant job
+- error - something wrong
+
+### events and listeners ###
+add listeners with addListeners method
+available 'error' and 'success'

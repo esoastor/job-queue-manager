@@ -2,16 +2,26 @@
 
 namespace Esoastor\JobQueueManager;
 
+use Esoastor\JobQueueManager\Events\JobResult;
 use \Database\Schema\Constructor;
 use \Database\TableManager;
-
+use \Esoastor\EventManager\ListenerProvider;
+use \Esoastor\EventManager\EventDispatcher;
 
 class JobQueueManager
 {
     private TableManager $table;
+    private EventDispatcher $dispatcher;
 
     public function __construct(private Constructor $constructor, private string $tableName)
+    {        
+        $provider = new ListenerProvider(['success', 'error']);
+        $this->dispatcher = new EventDispatcher($provider);
+    }
+
+    public function addListeners(string $name, array $listeners): void
     {
+        $this->dispatcher ->addListeners($name, $listeners);
     }
 
     public function initTable(): void
@@ -51,12 +61,11 @@ class JobQueueManager
 
     public function executeAll(bool $ignoreTimeOfNextRun = false): void
     {
-        $jobsData = $this->table->select()->whereIn('status', ['new', 'wait'])->execute();
+        $jobsData = $this->table->select()->whereIn('status', ['new', 'on', 'error'])->execute();
 
         if (empty($jobsData)) {
             return;
         }
-        
 
         foreach ($jobsData as $jobData) {
             $this->handleJob($jobData);
@@ -78,17 +87,23 @@ class JobQueueManager
             return;
         }
 
-        $this->table->update(['status' => 'pending'])->where('id', (string) $jobData['id'])->execute();
+        $this->table->update(['status' => 'running'])->where('id', (string) $jobData['id'])->execute();
     
         try {
             $job->handle();
         } catch (\Throwable $error) {
+            $event = new JobResult(['job' => serialize($job), 'error' => $error->getMessage()]);
+            $this->dispatcher->dispatch('error', $event);
+
             $this->table->update(['status' => 'error'])->where('id', (string) $jobData['id'])->execute();
             die;
         }
 
+        $event = new JobResult(['job' => serialize($job)]);
+        $this->dispatcher->dispatch('success', $event);
+
         if ($job->isConstant()) {
-            $this->table->update(['status' => 'wait', 'next_run' => time() + $job->getInterval()])->where('id', (string) $jobData['id'])->execute();
+            $this->table->update(['status' => 'on', 'next_run' => time() + $job->getInterval()])->where('id', (string) $jobData['id'])->execute();
         } else {
             $this->table->delete()->where('id', (string) $jobData['id'])->execute();
         }
