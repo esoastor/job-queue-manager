@@ -28,4 +28,5 @@ work statuses
 
 ### events and listeners ###
 add listeners with addListeners method
-available 'error' and 'success'
+
+available 'error' and 'success' events
