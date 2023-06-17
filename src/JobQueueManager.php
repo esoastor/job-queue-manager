@@ -68,7 +68,7 @@ class JobQueueManager
         }
 
         foreach ($jobsData as $jobData) {
-            $this->handleJob($jobData);
+            $this->handleJob($jobData, $ignoreTimeOfNextRun);
         }
     }
 
