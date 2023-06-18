@@ -17,14 +17,11 @@ class JobQueueManager
     {        
         $provider = new ListenerProvider(['success', 'error']);
         $this->dispatcher = new EventDispatcher($provider);
+
+        $this->initTable();
     }
 
-    public function addListeners(string $name, array $listeners): void
-    {
-        $this->dispatcher ->addListeners($name, $listeners);
-    }
-
-    public function initTable(): void
+    private function initTable(): void
     {
         $blueprint =  $this->constructor->getBlueprintBuilder();
 
@@ -33,10 +30,16 @@ class JobQueueManager
             $blueprint->text('job')->length(1000),
             $blueprint->varchar('status')->length(50),
             $blueprint->varchar('date_insert')->length(20),
+            $blueprint->text('unique_job_id')->nullable(),
             $blueprint->varchar('next_run')->length(20)->nullable()
         ]);
 
         $this->table = $this->constructor->getDatabase()->table($this->tableName);
+    }
+
+    public function addListeners(string $name, array $listeners): void
+    {
+        $this->dispatcher ->addListeners($name, $listeners);
     }
 
     public function getJobList(): array
@@ -50,13 +53,28 @@ class JobQueueManager
             throw new Errors\TableNotFound($this->tableName);
         }
 
+        $addJob = true;
+
         $fields = ['job' => serialize($job), 'status' => 'new', 'date_insert' => time()];
 
         if ($job->isConstant()) {
             $fields['next_run'] = time() + $job->getInterval();
         }
 
-        $this->table->insert($fields)->execute();
+        if ($job->isUnique()) {
+            $fields['unique_job_id'] = get_class($job);
+            $addJob = !$this->isJobPresented($fields['unique_job_id']);
+        }
+
+        if ($addJob) {
+            $this->table->insert($fields)->execute();
+        }
+    }
+
+    public function isJobPresented(string $uniqueJobId): bool
+    {
+        $uniqueJobData = $this->table->select()->where('unique_job_id', $uniqueJobId)->execute();
+        return !empty($uniqueJobData);
     }
 
     public function executeAll(bool $ignoreTimeOfNextRun = false): void
@@ -96,7 +114,7 @@ class JobQueueManager
             $this->dispatcher->dispatch('error', $event);
 
             $this->table->update(['status' => 'error'])->where('id', (string) $jobData['id'])->execute();
-            die;
+            return;
         }
 
         $event = new JobResult(['job' => serialize($job)]);
