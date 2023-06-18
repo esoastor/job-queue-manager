@@ -6,6 +6,6 @@ class PutInFileJob extends OneTimeJob
 {
     public function handle(): void
     {
-        file_put_contents('./hello.txt', time());
+        file_put_contents('./job-output.txt', 'PutInFileJob: ' . date('H:i:s') . PHP_EOL, FILE_APPEND);
     }
 }
