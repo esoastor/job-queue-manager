@@ -110,7 +110,14 @@ class JobQueueManager
         try {
             $job->handle();
         } catch (\Throwable $error) {
-            $event = new JobResult(['job' => serialize($job), 'error' => $error->getMessage()]);
+            try {
+                $jobText = serialize($job);
+            } catch (\Throwable $serializeProblem) {
+                # i know and i dont care
+                $jobText = '[' . get_class($job) . '][' . $serializeProblem->getMessage() . ']';
+            }
+            $event = new JobResult(['job' => $jobText, 'error' => $error->getMessage()]);
+
             $this->dispatcher->dispatch('error', $event);
 
             $this->table->update(['status' => 'error'])->where('id', (string) $jobData['id'])->execute();
