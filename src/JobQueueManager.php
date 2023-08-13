@@ -110,13 +110,7 @@ class JobQueueManager
         try {
             $job->handle();
         } catch (\Throwable $error) {
-            try {
-                $jobText = serialize($job);
-            } catch (\Throwable $serializeProblem) {
-                # i know and i dont care
-                $jobText = '[' . get_class($job) . '][' . $serializeProblem->getMessage() . ']';
-            }
-            $event = new JobResult(['job' => $jobText, 'error' => $error->getMessage()]);
+            $event = new JobResult(['job' => $this->serializeJob($job), 'error' => $error->getMessage()]);
 
             $this->dispatcher->dispatch('error', $event);
 
@@ -124,7 +118,7 @@ class JobQueueManager
             return;
         }
 
-        $event = new JobResult(['job' => serialize($job)]);
+        $event = new JobResult(['job' => $this->serializeJob($job)]);
         $this->dispatcher->dispatch('success', $event);
 
         if ($job->isConstant()) {
@@ -132,5 +126,17 @@ class JobQueueManager
         } else {
             $this->table->delete()->where('id', (string) $jobData['id'])->execute();
         }
+    }
+
+    protected function serializeJob(Job $job): string
+    {
+        try {
+            $jobText = serialize($job);
+        } catch (\Throwable $serializeProblem) {
+            # i know and i dont care
+            $jobText = '[' . get_class($job) . '][' . $serializeProblem->getMessage() . ']';
+        }
+
+        return $jobText;
     }
 }
